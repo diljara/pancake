@@ -1,12 +1,12 @@
 from random import randint
 import turtle
 
-def close(x1,x2,y1,y2):
-    if (x2-x1)**2+(y2-y1)**2<=5:
-        return True
-    return False
+#def close(x1,x2,y1,y2):
+    #if (x2-x1)**2+(y2-y1)**2<=5:
+        #return True
+    #return False
 
-number=15
+number=5
 steps=300
 V=4
 turtle.penup()
