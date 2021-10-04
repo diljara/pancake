@@ -60,7 +60,7 @@ def BIRDS(x, y, alpha=1): #alpha defines the size of the bird
     draw_ellipse_angle(screen, birds, [x + 12.5*alpha, y - 2*alpha, 43*alpha, 10*alpha], 50)
 
 
-c=[(0, 200), (100, 230), (250, 370),  (800, 450), (0, 0), (0, 200)]
+c=[(0, 200), (100, 230), (250, 370), (300, 420), (500, 440), (550, 380), (600, 400), (650, 300), (800, 248),  (800, 450), (0, 450), (0, 200)]
 
 polygon(screen, backhills, a)
 polygon(screen, midhills, x)
