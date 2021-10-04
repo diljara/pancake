@@ -16,7 +16,7 @@ sun = (252, 238, 33)
 line3 = (254, 213, 196)
 purple = (179, 134, 148)
 #skylines
-line(screen, sand, (0, 50), (800, 50), 100)
+line(screen, sky, (0, 50), (800, 50), 100)
 line(screen, line3, (0, 150), (800, 150), 100)
 line(screen, sand, (0, 250), (800, 250), 100)
 #listsformountains
