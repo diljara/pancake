@@ -19,7 +19,7 @@ purple = (179, 134, 148)
 line(screen, sand, (0, 50), (800, 50), 100)
 line(screen, line3, (0, 150), (800, 150), 100)
 line(screen, sand, (0, 250), (800, 250), 100)
-#mountainsurface
+#listsformountains
 dx = [50, 25, 40, 45, 33, 49, 56]
 dy = [28, -45, 27, -40, 30, -42, 10]
 x = [(0, 250)]
@@ -59,14 +59,13 @@ def BIRDS(x, y, alpha=1): #alpha defines the size of the bird
     draw_ellipse_angle(screen, birds, [x - 12.5*alpha, y, 40*alpha, 10*alpha], -45)
     draw_ellipse_angle(screen, birds, [x + 12.5*alpha, y - 2*alpha, 43*alpha, 10*alpha], 50)
 
-
-c=[(0, 200), (100, 230), (250, 370), (300, 420), (500, 440), (550, 380), (600, 400), (650, 300), (800, 248),  (800, 450), (0, 450), (0, 200)]
+listforfronthills=[(0, 200), (100, 230), (250, 370), (300, 420), (500, 440), (550, 380), (600, 400), (650, 300), (800, 248),  (800, 450), (0, 450), (0, 200)]
 
 polygon(screen, backhills, a)
 polygon(screen, midhills, x)
 polygon(screen, purple, [(0, 300), (800, 250), (800, 450), (0, 450)])
 circle(screen, sun, (400, 100), 40)
-polygon(screen, front, c)
+polygon(screen, front, listforfronthills)
 
 BIRDS(100, 100)
 BIRDS(400, 300)
