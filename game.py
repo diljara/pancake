@@ -23,10 +23,10 @@ COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 class Ball:
     def __init__(self):
-        self.x = randint(0, SCREEN_WIDTH - 50)
-        self.y = randint(0, SCREEN_HEIGHT - 50)
-        self.vx = random()*randint(-5, 5)
-        self.vy = randint(-5, 5)*random()
+        self.x = randint(50, SCREEN_WIDTH - 50)
+        self.y = randint(50, SCREEN_HEIGHT - 50)
+        self.vx = random()*randint(-15, 15)
+        self.vy = randint(-15, 15)*random()
         self.r = randint(10, 50)
         self.color = COLORS[randint(0, 5)]
         
@@ -50,18 +50,26 @@ class Ball:
 
 tup = Ball()
 targets = [tup]
+targets.append(Ball())
 pool = []
 for i in range(10):
     pool.append(Ball())   
-    
+def hit(ball1, ball2):
+    if pow((ball1.x - ball2.x), 2) + pow((ball1.y - ball2.y), 2) < ball1.r * ball1.r + ball2.r * ball2.r:
+        ball1.vx *= -1
+        ball1.vy *= -1
+        ball2.vx *= -1
+        ball2.vy *= -1
 def score():
     global scores
     counter = 0
-    if tup.x - tup.r <= event.pos[0] <= tup.x + tup.r:
-        if tup.y - tup.r <= event.pos[1] <= tup.y + tup.r:
-            print('+', 100)
-            counter += 1
-            pool.remove(tup)
+    for tup in targets:
+        if tup.x - tup.r <= event.pos[0] <= tup.x + tup.r:
+            if tup.y - tup.r <= event.pos[1] <= tup.y + tup.r:
+                print('+', 100)
+                counter += 1
+                scores += 100
+                targets.remove(tup)
     for ball in pool:
         if ball.x - ball.r <= event.pos[0] <= ball.x + ball.r:
             if ball.y - ball.r <= event.pos[1] <= ball.y + ball.r:            
@@ -74,9 +82,9 @@ def score():
             
 def draw_scores():
     pass
-def renew(list):
-    if len(list) < 10:
-        for i in range(10 - len(list)):
+def renew(list, number):
+    if len(list) < number:
+        for i in range(number - len(list)):
             list.append(Ball())
 
 pygame.display.update()
@@ -85,13 +93,22 @@ finished = False
 
 while not finished:
     clock.tick(FPS)
-    Ball.target(tup)
-    renew(targets)
+    for ball in targets:
+        Ball.target(ball)
+        pygame.display.update()
+        Ball.collision(ball)
+        renew(targets, 2)
+        hit(targets[0], targets[1])
     for ball in pool:
         Ball.move(ball)
         pygame.display.update()
         Ball.collision(ball)
-        renew(pool)
+        renew(pool, 10)
+    for i in range (len(pool)):
+        for j in range (i, len(pool)):
+            hit(pool[i], pool[j])
+            hit(pool[i], targets[0])
+            hit(pool[i], targets[1])
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
