@@ -133,7 +133,7 @@ class Gun:
 
 class Target(Ball):
     def __init__(self, x=randint(600, 780), y=randint(300, 550), 
-                      r=randint(10,25), vx=randint(10,25), vy=randint(10,25)):
+                      r=randint(10,25), vx=randint(0, 10), vy=randint(0, 10)):
         """ Инициализация цели
         Args:
         x - начальное положение target'а по горизонтали
@@ -142,8 +142,8 @@ class Target(Ball):
         self.x = x
         self.y = y
         self.r = r
-        self.vx = 0
-        self.vy = 0
+        self.vx = vx
+        self.vy = vy
         self.color = RED
         
     def move(self):
@@ -195,7 +195,7 @@ while not finished:
                     points += 1
                     bulletcounter = 0
                     del balls[2:]
-                    target = Target(randint(600, 780), randint(300, 550), randint(10,25), randint(10,25), randint(10,25))
+                    target = Target(randint(600, 780), randint(300, 550), randint(10, 25), randint(0, 10), randint(0, 10))
             if b.live == 0:
                 bulletcounter += 1
                 balls.remove(b)
