@@ -61,10 +61,10 @@ class Ball:
         )
 
     def hittest(self, obj):
-        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
+        """Функция проверяет сталкивалкивается ли данный объект с целью(объект obj).
 
         Args:
-            obj: Обьект, с которым проверяется столкновение.
+            obj: Объ ект, с которым проверяется столкновение.
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
@@ -113,22 +113,28 @@ class Gun:
         else:
             self.color = GREY
 
-    def draw(self):        
-        pygame.draw.line(screen, self.color, (20, 450), pygame.mouse.get_pos(), width=10) 
+    def draw(self):
+        x = pygame.mouse.get_pos()[0]
+        y = pygame.mouse.get_pos()[1]
+        deltax, deltay = self.f2_power * (x - 20) // 150, self.f2_power * (y - 450) // 150    
+        pygame.draw.line(screen, self.color, (20, 450), (20 + deltax, 450 + deltay), width=10)
+         
 
     def power_up(self):
         if self.f2_on:
             if self.f2_power < 100:
                 self.f2_power += 1
+                self.draw()
+                
             self.color = RED
         else:
             self.color = GREY
 
 
 class Target(Ball):
-    def __init__(self, x=randint(600, 780), y=randint(300, 550), r=randint(10,25)):
+    def __init__(self, x=randint(600, 780), y=randint(300, 550), 
+                      r=randint(10,25), vx=randint(10,25), vy=randint(10,25)):
         """ Инициализация цели
-
         Args:
         x - начальное положение target'а по горизонтали
         y - начальное положение target'а по вертикали
@@ -139,6 +145,20 @@ class Target(Ball):
         self.vx = 0
         self.vy = 0
         self.color = RED
+        
+    def move(self):
+        """Переместить target по прошествии единицы времени.
+
+        Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
+        self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
+        и стен по краям окна (размер окна 800х600).
+        """
+        self.x += self.vx 
+        self.y -= self.vy
+        if abs(self.x - 400 - self.r) >= 400:
+            self.vx *= -1
+        if abs(self.y - 300 - self.r) >= 300:
+            self.vy *= -1
 
 def draw(sth, x=50, y=50):
     f1 = pygame.font.Font(None, 30)
@@ -148,33 +168,37 @@ def draw(sth, x=50, y=50):
     pygame.display.update() 
 
 pygame.init()
-points = 0
-bulletcounter = 0
-balls = []
 
 clock = pygame.time.Clock()
 gun = Gun()
-target = Target()
+target1 = Target()
+target2 = Target()
+points = 0
+bulletcounter = 0
+balls = [target1, target2]
 finished = False
 
 while not finished:
     screen.fill(WHITE)
     gun.draw()
-    target.draw()
+    for target in balls[0:2]:
+        target.draw()
     draw('points : ' + str(points))
     draw('shots : ' + str(bulletcounter), 50, 100)
     draw('emo kid is watching you: ///_^', 200, 100)
-    for b in balls:
+    for i, b in enumerate(balls):
         b.draw()
         b.move()
-        if b.hittest(target):
-            points += 1
-            bulletcounter = 0
-            balls = []
-            target = Target(randint(600, 780), randint(300, 550), randint(10,25))
-        if b.live == 0:
-            bulletcounter += 1
-            balls.remove(b)
+        if i > 1:
+            for target in balls[0:2]:
+                if b.hittest(target):
+                    points += 1
+                    bulletcounter = 0
+                    del balls[2:]
+                    target = Target(randint(600, 780), randint(300, 550), randint(10,25), randint(10,25), randint(10,25))
+            if b.live == 0:
+                bulletcounter += 1
+                balls.remove(b)
     pygame.display.update()
 
     clock.tick(FPS)
@@ -187,7 +211,6 @@ while not finished:
             bullet = gun.fire2_end(event)
             balls.append(bullet)
             bulletcounter += 1
-            print(balls)
         elif event.type == pygame.MOUSEMOTION:
             gun.targetting(event)
     gun.power_up()
