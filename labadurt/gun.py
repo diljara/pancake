@@ -13,8 +13,8 @@ MAGENTA = 0xFF03B8
 CYAN = 0x00FFCC
 WHITE = 0xFFFFFF
 GREY = 0x7D7D7D
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 BLACK = 0x000000
+GAME_COLORS = [BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
@@ -22,8 +22,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 class Ball:
     def __init__(self, x=40, y=450):
-        """ Конструктор класса ball
-
+        """ Конструктор класса Ball
         Args:
         x - начальное положение мяча по горизонтали
         y - начальное положение мяча по вертикали
@@ -46,10 +45,10 @@ class Ball:
         self.x += self.vx 
         self.y -= self.vy
         self.vy -= 1.0
-        if abs(self.x - 400) >= 400:
+        if abs(self.x - 400 - self.r) >= 400:
             self.vx *= -1
             self.live -= 1
-        if abs(self.y - 300) >= 300:
+        if abs(self.y - 300 - self.r) >= 300:
             self.vy *= -0.75
             self.live -= 1
 
@@ -71,7 +70,7 @@ class Ball:
         """
 
         distsq = (self.x - obj.x) ** 2 + (self.y - obj.y) ** 2
-        if distsq <= self.r ** 2 + obj.r ** 2:
+        if distsq <= self.r ** 2 + obj.r ** 2 + 2:
             return True
         else:
             return False
@@ -127,8 +126,8 @@ class Gun:
 
 
 class Target(Ball):
-    def __init__(self, x=randint(600, 780), y=randint(300, 550)):
-        """ Инициализация новой цели
+    def __init__(self, x=randint(600, 780), y=randint(300, 550), r=randint(10,25)):
+        """ Инициализация цели
 
         Args:
         x - начальное положение target'а по горизонтали
@@ -136,7 +135,7 @@ class Target(Ball):
         """
         self.x = x
         self.y = y
-        self.r = 10
+        self.r = r
         self.vx = 0
         self.vy = 0
         self.color = RED
@@ -150,6 +149,7 @@ def draw(sth, x=50, y=50):
 
 pygame.init()
 points = 0
+bulletcounter = 0
 balls = []
 
 clock = pygame.time.Clock()
@@ -161,8 +161,20 @@ while not finished:
     screen.fill(WHITE)
     gun.draw()
     target.draw()
+    draw('points : ' + str(points))
+    draw('shots : ' + str(bulletcounter), 50, 100)
+    draw('emo kid is watching you: ///_^', 200, 100)
     for b in balls:
         b.draw()
+        b.move()
+        if b.hittest(target):
+            points += 1
+            bulletcounter = 0
+            balls = []
+            target = Target(randint(600, 780), randint(300, 550), randint(10,25))
+        if b.live == 0:
+            bulletcounter += 1
+            balls.remove(b)
     pygame.display.update()
 
     clock.tick(FPS)
@@ -174,18 +186,10 @@ while not finished:
         elif event.type == pygame.MOUSEBUTTONUP:
             bullet = gun.fire2_end(event)
             balls.append(bullet)
+            bulletcounter += 1
+            print(balls)
         elif event.type == pygame.MOUSEMOTION:
             gun.targetting(event)
-
-    for b in balls:
-        b.move()
-        if b.live == 0:
-            b.color = WHITE
-        if b.hittest(target):
-            points += 1
-            draw('Вы уничтожили цель за' + str(len(balls)) + 'выстрелов', 100, 200)
-            balls = []
-            target = Target()
     gun.power_up()
 
 pygame.quit()
