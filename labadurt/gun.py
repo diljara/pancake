@@ -190,12 +190,12 @@ while not finished:
         b.draw()
         b.move()
         if i > 1:
-            for target in balls[0:2]:
+            for i, target in enumerate(balls[0:2]):
                 if b.hittest(target):
                     points += 1
                     bulletcounter = 0
                     del balls[2:]
-                    target = Target(randint(600, 780), randint(300, 550), randint(10, 25), randint(0, 10), randint(0, 10))
+                    balls[i] = Target(randint(600, 780), randint(300, 550), randint(10, 25), randint(0, 10), randint(0, 10))
             if b.live == 0:
                 bulletcounter += 1
                 balls.remove(b)
