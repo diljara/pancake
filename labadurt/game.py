@@ -13,6 +13,7 @@ SCREEN_WIDTH = 1200
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 surf = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 scores = 0
+delta = '0'
 
 #color definition
 RED = (255, 0, 0)
@@ -66,7 +67,8 @@ def draw(sth, x, y):
     surf.blit(text1, (x, y))
     pygame.display.update()  
 def hit(ball1, ball2):
-    if pow((ball1.x - ball2.x), 2) + pow((ball1.y - ball2.y), 2) < ball1.r * ball1.r + ball2.r * ball2.r:
+    distsq = (ball1.x - ball2.x) ** 2 + (ball1.y - ball2.y) ** 2
+    if distsq < ball1.r ** 2+ ball2.r ** 2:
         ball1.vx *= -1
         ball1.vy *= -1
         ball2.vx *= -1
@@ -75,19 +77,23 @@ def score():
     global scores
     counter = 0
     for tup in targets:
-        if tup.x - tup.r <= event.pos[0] <= tup.x + tup.r:
-            if tup.y - tup.r <= event.pos[1] <= tup.y + tup.r:
-                draw('+ 100', 100, 100)
-                counter += 1
-                scores += 100
-                targets.remove(tup)
+        if tup.x - tup.r <= event.pos[0]:
+            if tup.x + tup.r >= event.pos[0]:
+                if tup.y - tup.r <= event.pos[1]:
+                    if tup.y + tup.r >= event.pos[1]:
+                        counter += 1
+                        scores += 100
+                        targets.remove(tup)
+                        return '100'
     for ball in pool:
-        if ball.x - ball.r <= event.pos[0] <= ball.x + ball.r:
-            if ball.y - ball.r <= event.pos[1] <= ball.y + ball.r:            
-                scores += 50 - ball.r
-                draw('+'+ str(50 - ball.r), 100, 100)
-                counter += 1
-                pool.remove(ball)
+        if ball.x - ball.r <= event.pos[0]:
+            if ball.x + ball.r >= event.pos[0]:
+                if ball.y - ball.r <= event.pos[1]:
+                    if ball.y + ball.r >= event.pos[1]:
+                        scores += 50 - ball.r
+                        counter += 1
+                        pool.remove(ball)
+                        return str(50 - ball.r)
     #if counter == 0:
         #print('Click!')
             
@@ -101,9 +107,13 @@ def renew(list, number):
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
+font = pygame.font.SysFont(None, 100)
+text = ""
+input_active = True
 
 while not finished:
     clock.tick(FPS)
+    screen.fill(BLACK)
     for ball in targets:
         Ball.target(ball)
         pygame.display.update()
@@ -121,12 +131,16 @@ while not finished:
             hit(pool[i], targets[0])
             hit(pool[i], targets[1])
     draw(scores, 100, 50)
+    if delta is not None:
+        draw('+' + delta, 100, 100)
     pygame.display.update()
     for event in pygame.event.get():
-        if event.type == pygame.QUIT or event.type == pygame.KEYDOWN:
+        if event.type == pygame.QUIT or\
+               event.type == pygame.KEYDOWN:
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            score()
+            delta = score()
+            
 
 pygame.display.update()
 screen.fill(BLACK)
@@ -134,7 +148,8 @@ draw(scores, 100, 50)
 
 with open("records.json", 'r') as f:
     loaded = json.load(f) 
-loaded['results'] = sorted(loaded['results'], key=lambda x: x['points'], reverse=True)
+loaded['results'] = sorted(loaded['results'], 
+                            key=lambda x: x['points'], reverse=True)
 
 x = 150
 y = 150
@@ -144,7 +159,22 @@ for i, el in enumerate(loaded['results']):
         break
     y += 50
     draw(el['name']+'    '  +str(el['points']), x, y)
-draw('put your nickname', 150, 100)     
+draw('put your nickname', 150, 100)
+if event.type == pygame.MOUSEBUTTONDOWN:
+    input_active = True
+    text = ""
+elif event.type == pygame.KEYDOWN and input_active:
+    if event.key == pygame.K_RETURN:
+        input_active = False
+elif event.key == pygame.K_BACKSPACE:
+    text =  text[:-1]
+else:
+    text += event.unicode
+screen.fill(0)
+text_surf = font.render(text, True, (255, 0, 0))
+screen.blit(text_surf, text_surf.get_rect(center = screen.get_rect().center))
+pygame.display.flip()
+    
 with open("records.json", 'w') as f:
     json.dump(loaded, f)
 x = 150
@@ -155,7 +185,7 @@ for i, el in enumerate(loaded['results']):
         break
     y += 50
     draw(el['name'] + '    '  +str(el['points']), x, y)
-nickname = input('put your nickname:')
+nickname = text
 loaded['results'].append({'name': nickname, 'points': scores})
 screen.fill(BLACK)
 for event in pygame.event.get():
