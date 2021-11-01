@@ -58,7 +58,8 @@ class Ball:
             
     def collision(self):
         '''
-        collision defines if collision happened after an event
+        collision defines if collision with a wall happened after an event
+        and makes ball turn in the opposite direction
         '''
         if self.x < self.r or self.x + self.r > SCREEN_WIDTH:
             self.vx = -self.vx
@@ -72,6 +73,10 @@ pool = []
 for i in range(10):
     pool.append(Ball())
 def draw(sth, x, y):
+    '''
+    function hepls to draw an object of str
+    x, y define the position
+    '''
     global WHITE
     f1 = pygame.font.Font(None, 30)
     pygame.font.SysFont('arial', 72)
@@ -79,6 +84,10 @@ def draw(sth, x, y):
     surf.blit(text1, (x, y))
     pygame.display.update()  
 def hit(ball1, ball2):
+    '''
+    the function defines if balls have hit each other
+    and makes them move in opposite directions if so
+    '''
     distsq = (ball1.x - ball2.x) ** 2 + (ball1.y - ball2.y) ** 2
     if distsq < ball1.r ** 2+ ball2.r ** 2:
         ball1.vx *= -1
