@@ -74,6 +74,9 @@ def hit(ball1, ball2):
         ball2.vx *= -1
         ball2.vy *= -1
 def score():
+    '''
+    function calculates scores after the event
+    '''
     global scores
     counter = 0
     for tup in targets:
@@ -100,6 +103,10 @@ def score():
 
 
 def renew(list, number):
+    ''' 
+    if the length of the list is less than the number
+    the function adds required number of balls
+    '''
     if len(list) < number:
         for i in range(number - len(list)):
             list.append(Ball())
