@@ -29,6 +29,9 @@ COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 #defining class ball
 class Ball:
     def __init__(self):
+        '''
+        initiation of the class Balls
+        '''
         self.x = randint(50, SCREEN_WIDTH - 50)
         self.y = randint(50, SCREEN_HEIGHT - 50)
         self.vx = random()*randint(-15, 15)
@@ -37,17 +40,26 @@ class Ball:
         self.color = COLORS[randint(0, 5)]
         
     def move(self, surface=screen):
+        '''
+        move defines the way balls move
+        '''
         circle(surface, self.color, (self.x, self.y), self.r)
         self.x += self.vx * t
         self.y += self.vy * t
     
     def target(self, surface = screen):
+        '''
+        target draws 2 targets that move
+        '''
         circle(surface, RED, (self.x, self.y), self.r, self.r//2)
         circle(surface, WHITE, (self.x, self.y), self.r - self.r//2)
         self.x += self.vx * t
         self.y += self.vy * t
             
     def collision(self):
+        '''
+        collision defines if collision happened after an event
+        '''
         if self.x < self.r or self.x + self.r > SCREEN_WIDTH:
             self.vx = -self.vx
         if self.y < self.r or self.y + self.r > SCREEN_HEIGHT:
