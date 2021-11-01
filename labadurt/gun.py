@@ -45,10 +45,10 @@ class Ball:
         self.x += self.vx 
         self.y -= self.vy
         self.vy -= 1.0
-        if abs(self.x - 400 - self.r) >= 400:
+        if abs(self.x - 400 - self.r) >= 370:
             self.vx *= -1
             self.live -= 1
-        if abs(self.y - 300 - self.r) >= 300:
+        if abs(self.y - 300 - self.r) >= 270:
             self.vy *= -0.75
             self.live -= 1
 
@@ -64,7 +64,7 @@ class Ball:
         """Функция проверяет сталкивалкивается ли данный объект с целью(объект obj).
 
         Args:
-            obj: Объ ект, с которым проверяется столкновение.
+            obj: Объект, с которым проверяется столкновение.
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
@@ -95,8 +95,8 @@ class Gun:
         new_ball = Ball()
         new_ball.r += 5
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
-        new_ball.vx = self.f2_power * math.cos(self.an)
-        new_ball.vy = - self.f2_power * math.sin(self.an)
+        new_ball.vx = self.f2_power * math.cos(self.an) * 0.8
+        new_ball.vy = - self.f2_power * math.sin(self.an) * 0.8
         self.f2_on = 0
         self.f2_power = 10
         return(new_ball)
@@ -155,12 +155,17 @@ class Target(Ball):
         """
         self.x += self.vx 
         self.y -= self.vy
-        if abs(self.x - 400 - self.r) >= 400:
+        if abs(self.x - 400 - self.r) >= 370:
             self.vx *= -1
-        if abs(self.y - 300 - self.r) >= 300:
+        if abs(self.y - 300 - self.r) >= 270:
             self.vy *= -1
 
-def draw(sth, x=50, y=50):
+def draw(sth:str, x=50, y=50):
+    '''
+    the function draws sth
+    x, y define the position of text in the screen
+    default x, y = 50, 50
+    '''
     f1 = pygame.font.Font(None, 30)
     pygame.font.SysFont('arial', 72)
     text1 = f1.render(str(sth), 1, BLACK)
@@ -172,7 +177,7 @@ pygame.init()
 clock = pygame.time.Clock()
 gun = Gun()
 target1 = Target()
-target2 = Target()
+target2 = Target(randint(600, 780), randint(300, 550), randint(10, 25), randint(0, 10), randint(0, 10))
 points = 0
 bulletcounter = 0
 balls = [target1, target2]
@@ -197,7 +202,6 @@ while not finished:
                     del balls[2:]
                     balls[i] = Target(randint(600, 780), randint(300, 550), randint(10, 25), randint(0, 10), randint(0, 10))
             if b.live == 0:
-                bulletcounter += 1
                 balls.remove(b)
     pygame.display.update()
 
