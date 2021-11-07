@@ -14,14 +14,14 @@ CYAN = 0x00FFCC
 WHITE = 0xFFFFFF
 GREY = 0x7D7D7D
 BLACK = 0x000000
-GAME_COLORS = [BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+GAME_COLORS = [BLUE, YELLOW, GREEN, MAGENTA, CYAN, BLACK]
 
 WIDTH = 800
 HEIGHT = 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 class Ball:
-    def __init__(self, x=40, y=450):
+    def __init__(self, x=40, y=450, r=10, vx=0, vy=0, color=choice(GAME_COLORS)):
         """ Конструктор класса Ball
         Args:
         x - начальное положение мяча по горизонтали
@@ -29,10 +29,10 @@ class Ball:
         """
         self.x = x
         self.y = y
-        self.r = 10
-        self.vx = 0
-        self.vy = 0
-        self.color = choice(GAME_COLORS)
+        self.r = r
+        self.vx = vx
+        self.vy = vy
+        self.color = color
         self.live = 10
 
     def move(self):
@@ -133,18 +133,13 @@ class Gun:
 
 class Target(Ball):
     def __init__(self, x=randint(600, 780), y=randint(300, 550), 
-                      r=randint(10,25), vx=randint(0, 10), vy=randint(0, 10)):
+                      r=randint(10,25), vx=randint(0, 10), vy=randint(0, 10), color=RED):
         """ Инициализация цели
         Args:
         x - начальное положение target'а по горизонтали
         y - начальное положение target'а по вертикали
         """
-        self.x = x
-        self.y = y
-        self.r = r
-        self.vx = vx
-        self.vy = vy
-        self.color = RED
+        super().__init__(x, y, r, vx, vy, color)
         
     def move(self):
         """Переместить target по прошествии единицы времени.
@@ -176,11 +171,11 @@ pygame.init()
 
 clock = pygame.time.Clock()
 gun = Gun()
-target1 = Target()
-target2 = Target(randint(600, 780), randint(300, 550), randint(10, 25), randint(0, 10), randint(0, 10))
+balls = []
+for i in range(2):
+    balls.append(Target())
 points = 0
 bulletcounter = 0
-balls = [target1, target2]
 finished = False
 
 while not finished:
@@ -195,13 +190,13 @@ while not finished:
         b.draw()
         b.move()
         if i > 1:
-            for i, target in enumerate(balls[0:2]):
+            for j, target in enumerate(balls[:2]):
                 if b.hittest(target):
                     points += 1
                     bulletcounter = 0
                     del balls[2:]
-                    balls[i] = Target(randint(600, 780), randint(300, 550), randint(10, 25), randint(0, 10), randint(0, 10))
-            if b.live == 0:
+                    balls[j] = Target()
+        if b.live == 0:
                 balls.remove(b)
     pygame.display.update()
 
@@ -217,6 +212,10 @@ while not finished:
             bulletcounter += 1
         elif event.type == pygame.MOUSEMOTION:
             gun.targetting(event)
+        elif pygame.key.get_pressed()[pygame.K_RETURN] :
+            screen.fill(WHITE)
+            
     gun.power_up()
-
 pygame.quit()
+
+
