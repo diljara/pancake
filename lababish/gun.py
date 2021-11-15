@@ -1,6 +1,6 @@
 import math
 from random import choice, randint
-
+import json
 import pygame
 
 FPS = 30
@@ -21,7 +21,7 @@ HEIGHT = 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 class Ball:
-    def __init__(self, x=40, y=450, r=10, vx=0, vy=0, color=choice(GAME_COLORS)):
+    def __init__(self, x=40, y=450, r=15, vx=0, vy=0, color=choice(GAME_COLORS)):
         """ Конструктор класса Ball
         Args:
         x - начальное положение мяча по горизонтали
@@ -93,7 +93,7 @@ class Gun:
         Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
         """
         new_ball = Ball()
-        new_ball.r += 5
+        new_ball.color = choice(GAME_COLORS)
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an) * 0.8
         new_ball.vy = - self.f2_power * math.sin(self.an) * 0.8
@@ -136,7 +136,7 @@ class Target(Ball):
                       r=randint(10,25), vx=randint(0, 10), vy=randint(0, 10), color=RED):
         """ Инициализация цели
         Args:
-        x - начальное положение target'а по горизонтали
+        x - начальное положение tонлайн компилятор pygamearget'а по горизонтали
         y - начальное положение target'а по вертикали
         """
         super().__init__(x, y, r, vx, vy, color)
@@ -166,6 +166,42 @@ def draw(sth:str, x=50, y=50):
     text1 = f1.render(str(sth), 1, BLACK)
     screen.blit(text1, (x, y))
     pygame.display.update() 
+def stopgame(scores):
+    pygame.display.update()
+    screen.fill(BLACK)
+    draw(scores, 100, 50)
+
+    with open("records.json", 'r') as f:
+        loaded = json.load(f) 
+    loaded['results'] = sorted(loaded['results'], 
+                            key=lambda x: x['points'], reverse=True)
+
+    x = 150
+    y = 150
+    screen.fill(BLACK)
+    for i, el in enumerate(loaded['results']):
+        if i > 9:
+            break
+        y += 50
+        draw(el['name']+'    '  +str(el['points']), x, y)
+    draw('put your nickname', 150, 100)
+
+    
+    with open("records.json", 'w') as f:
+        json.dump(loaded, f)
+    y = 150
+    screen.fill(BLACK)
+    for i, el in enumerate(loaded['results']):
+        if i > 9:
+            break
+        y += 50
+        draw(el['name'] + '    '  +str(el['points']), x, y)
+    nickname = input()
+    loaded['results'].append({'name': nickname, 'points': scores})
+    screen.fill(BLACK)
+    for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()   
 
 pygame.init()
 
@@ -173,7 +209,8 @@ clock = pygame.time.Clock()
 gun = Gun()
 balls = []
 for i in range(2):
-    balls.append(Target())
+    balls.append(Target(randint(600, 780), randint(300, 550), 
+                      randint(10,25), randint(0, 10), randint(0, 10)))
 points = 0
 bulletcounter = 0
 finished = False
@@ -181,8 +218,6 @@ finished = False
 while not finished:
     screen.fill(WHITE)
     gun.draw()
-    for target in balls[0:2]:
-        target.draw()
     draw('points : ' + str(points))
     draw('shots : ' + str(bulletcounter), 50, 100)
     draw('emo kid is watching you: ///_^', 200, 100)
@@ -195,15 +230,17 @@ while not finished:
                     points += 1
                     bulletcounter = 0
                     del balls[2:]
-                    balls[j] = Target()
+                    balls[j] = Target(x=randint(600, 780), y=randint(300, 550), 
+                      r=randint(10,25), vx=randint(0, 10), vy=randint(0, 10))
         if b.live == 0:
-                balls.remove(b)
+            balls.remove(b)
     pygame.display.update()
-
     clock.tick(FPS)
+    gun.power_up()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            finished = True
+            #finished = True
+            pygame.quit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             gun.fire2_start(event)
         elif event.type == pygame.MOUSEBUTTONUP:
@@ -212,10 +249,10 @@ while not finished:
             bulletcounter += 1
         elif event.type == pygame.MOUSEMOTION:
             gun.targetting(event)
-        elif pygame.key.get_pressed()[pygame.K_RETURN] :
-            screen.fill(WHITE)
-            
-    gun.power_up()
+        elif pygame.key.get_pressed()[pygame.K_RETURN]:
+            finished = True        
+stopgame(points)
+
 pygame.quit()
 
 
