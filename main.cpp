@@ -27,16 +27,16 @@ void step(int numbers[6][6], int empti[6][2], int n)
         {
             int z = rand() % 4;
             if (z == 0) {
-                empti[i][0] = x + 1;
+                empti[i][0]++;
             }
             if (z == 2) {
-                empti[i][0] = x - 1;
+                empti[i][0]--;
             }
             if (z == 1) {
-                empti[i][1] = y + 1;
+                empti[i][1]++;
             }
             if (z == 3) {
-                empti[i][1] = y - 1;
+                empti[i][1]--;
             }
 
             numbers[x][y] = 1;
@@ -52,18 +52,20 @@ void check(int numbers[6][6], int empti[6][2], int n)
     {
         int x = empti[i][0];
         int y = empti[i][1];
-        for (int j = i + 1; j < n; j++)
-        {
-            if ((x == 5) || (y == 5) || (x == 0) || (y == 0)){
+        if ((x == 5) || (y == 5) || (x == 0) || (y == 0)){
                numbers[x][y] = -1;
             }
-            else if (abs(x - empti[j][0]) + abs (y - empti[j][1]) == 1)
-            {
-                numbers[x][y] = -1;
-                numbers[empti[j][0]][empti[j][1]] = -1;
+        else {
+             for (int j = i + 1; j < n; j++)
+               {
+                 if (abs(x - empti[j][0]) + abs (y - empti[j][1]) == 1)
+                  {
+                   numbers[x][y] = -1;
+                   numbers[empti[j][0]][empti[j][1]] = -1;
 
-            }
+               }
 
+        }
         }
     }
 }
@@ -97,7 +99,7 @@ int main()
             numbers[i][j] = 1;
             }
     }
-    print(numbers);
+    //print(numbers);
     srand(time(NULL));
     int n = rand() % 6;
     int empti [6][2];
@@ -109,25 +111,27 @@ int main()
         empti[i][1] = y;
         numbers[x][y] = 0;
     }
-    print(numbers);
+    //print(numbers);
     for (int i=0; i < n; i++, cout << endl)
     {
         for (int j=0; j < 2; j++)
         {
-        cout << empti[i][j];
+        //cout << empti[i][j];
         }
     }
     bool done = true;
     cout << 0 << endl;
     print(numbers);
+    check(numbers, empti, n);
     for (int t = 1; done == true; t++)
-        {
-        check(numbers, empti, n);
+    {
         done = (multiply(numbers) == 0);
         step(numbers, empti, n);
+        check(numbers, empti, n);
         cout << t << endl;
         print(numbers);
-        }
+        done = (multiply(numbers) == 0);
+    }
 
 
     return 0;
